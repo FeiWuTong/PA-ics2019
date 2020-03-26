@@ -8,6 +8,7 @@
 #include <readline/history.h>
 
 void cpu_exec(uint64_t);
+void isa_reg_display();
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -38,6 +39,12 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+/* pa1-4 */
+static int cmd_si(char *args);
+static int cmd_info(char *args);
+static int cmd_x(char *args);
+/* pa1-4 */
+
 static struct {
   char *name;
   char *description;
@@ -48,6 +55,9 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
+  { "si", "Single step execution of N instructions then suspend, usage: si [N], default N = 1", cmd_si },
+  { "info", "Usage: info [rw], [r] means print the register, [w] means print the watchpoint", cmd_info },
+  { "x", "Scan memory from specific address, usage: x [N] [EXPR], where N represents output N-4bytes successively, and EXPR represents expression whose value will be starting address of the scan", cmd_x },
 
 };
 
@@ -75,6 +85,69 @@ static int cmd_help(char *args) {
   }
   return 0;
 }
+
+/* pa1-4 */
+static int cmd_si(char *args) {
+	uint64_t step = 1;
+	if (args) {
+		unsigned long long temp = strtoull(args, NULL, 10);
+		if (temp == 0) {
+			printf("si command should be 'si [N]', in which N is an unsigned long long number that bigger than 0\n");
+			return 0;
+		}
+		step = (uint64_t)temp;
+	}
+	cpu_exec(step);
+	return 0;
+}
+
+static int cmd_info(char *args) {
+	char *subcmd = strtok(NULL, " ");
+	if (subcmd == NULL) {
+		printf("Usage: info [rw]\nTry 'help info' for more information.\n");
+	}
+	else if (strcmp(subcmd, "r") == 0) {
+		isa_reg_display();
+	}
+	else if (strcmp(subcmd, "w") == 0) {
+		; /* TODO */
+	}
+	else {
+		printf("Usage: info [rw]\nTry 'help info' for more information.\n");
+	}
+	return 0;
+}
+
+static int cmd_x(char *args) {
+	char *arg = strtok(NULL, " ");
+	if (arg == NULL) {
+		printf("Usage: x [N] [EXPR]\nTry 'help x' for more information.\n");
+		return 0;
+	}
+	int n = atoi(arg);
+	if (n <= 0) {
+		printf("N must be an integer and bigger than 0\n");
+		return 0;
+	}
+	/* temp use hexadecimal only instead of expression */
+	arg = strtok(NULL, " ");
+	if (arg == NULL) {
+		printf("Usage: x [N] [EXPR]\nTry 'help x' for more information.\n");
+		return 0;
+	}
+	vaddr_t expr = strtoul(arg, NULL, 16);
+
+	int i;
+	while (n--) {
+		printf("  %x:   ", expr);
+		for (i = 0; i < 4; i++) {
+			printf("%02x ", vaddr_read(expr++, 1));
+		}
+		printf("\n");
+	}
+	return 0;
+}
+/* pa1-4 */
 
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {

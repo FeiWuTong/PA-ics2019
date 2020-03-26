@@ -41,6 +41,11 @@ void reg_test() {
 }
 
 void isa_reg_display() {
+	int i;
+  	for (i = R_EAX; i <= R_EDI; i ++) { 
+		printf("%s - 0x%x\n", reg_name(i, 4), reg_l(i));
+	}
+	printf("pc - 0x%x\n", cpu.pc);
 }
 
 uint32_t isa_reg_str2val(const char *s, bool *success) {
