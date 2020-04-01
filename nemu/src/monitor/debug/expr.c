@@ -7,10 +7,26 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ
+  TK_NOTYPE = 256, TK_EQ,
 
   /* TODO: Add more token types */
-
+	  /* PA1-5 */
+	  TK_ADD = '+',
+	  TK_SUB = '-',
+	  TK_MUL = '*',
+	  TK_DIV = '/',
+	  TK_LP = '(',
+	  TK_RP = ')',
+	  HEX = 258,
+	  DEREF,
+	  NUM,
+	  VAR,
+	  REG,
+	  TK_NEQ,
+	  TK_NOT,
+	  TK_AND,
+	  TK_OR
+	  /* PA1-5 */
 };
 
 static struct rule {
@@ -23,8 +39,25 @@ static struct rule {
    */
 
   {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"==", TK_EQ}         // equal
+  {"\\+", TK_ADD},		// plus
+  {"==", TK_EQ},        // equal
+  
+  /* PA1-5 */
+  {"\\-", TK_SUB},		// sub
+  {"\\*", '*'},			// multiply or dereference
+  {"/", TK_DIV},		// divide
+  {"0[xX][0-9a-fA-F]+", HEX},	// hex
+  {"\\(", TK_LP},		// left parenthesis
+  {"\\)", TK_RP},		// right parenthesis
+  {"[1-9]\\d*|0", NUM},		// number
+  {"[a-zA-Z_]+\\w*", VAR},	// variable
+  {"\\$[eE][a-zA-Z]{2}", REG},	// register
+  {"!=", TK_NEQ},		// not equal
+  {"!", TK_NOT},		// not
+  {"&&", TK_AND},		// and
+  {"\\|\\|", TK_OR},	// or
+  /* PA1-5 */
+
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -79,9 +112,22 @@ static bool make_token(char *e) {
          * of tokens, some extra actions should be performed.
          */
 
+		/* pa1-5 */
         switch (rules[i].token_type) {
-          default: TODO();
+			case TK_NOTYPE:
+				break;
+			case HEX:
+			case NUM:
+			case VAR:
+			case REG:
+				assert(substr_len < 32);
+				memset(tokens[nr_token].str, '\0', sizeof(tokens[nr_token].str));
+				strncpy(tokens[nr_token].str, substr_start, substr_len);
+			default:
+				tokens[nr_token].type = rules[i].token_type;
+				nr_token++;
         }
+		/* pa1-5 */
 
         break;
       }
@@ -96,11 +142,28 @@ static bool make_token(char *e) {
   return true;
 }
 
+/* pa1-5 test
+ * FOR TEST: output the information of token in tokenArray
+ */
+void tokenOutput() {
+	int i;
+	for (i = 0; i < nr_token; i++) {
+		if (tokens[i].type > 255) {
+			printf("Token[%d] - Type[%d] - Str[%s]\n", i, tokens[i].type, tokens[i].str);
+		} else {
+			printf("Token[%d] - Type[%c]\n", i, tokens[i].type);
+		}
+	}
+}
+/* pa1-5 test */
+
 uint32_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
     return 0;
   }
+
+  tokenOutput();
 
   /* TODO: Insert codes to evaluate the expression. */
   TODO();
