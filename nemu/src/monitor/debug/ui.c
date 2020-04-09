@@ -45,6 +45,10 @@ static int cmd_info(char *args);
 static int cmd_x(char *args);
 /* pa1-4 */
 
+/* pa1-5 */
+static int cmd_p(char *args);
+/* pa1-5 */
+
 static struct {
   char *name;
   char *description;
@@ -58,6 +62,7 @@ static struct {
   { "si", "Single step execution of N instructions then suspend, usage: si [N], default N = 1", cmd_si },
   { "info", "Usage: info [rw], [r] means print the register, [w] means print the watchpoint", cmd_info },
   { "x", "Scan memory from specific address, usage: x [N] [EXPR], where N represents output N-4bytes successively, and EXPR represents expression whose value will be starting address of the scan", cmd_x },
+  { "p", "Evaluate the expression, usage: p [EXPR]", cmd_p},
 
 };
 
@@ -135,19 +140,44 @@ static int cmd_x(char *args) {
 		printf("Usage: x [N] [EXPR]\nTry 'help x' for more information.\n");
 		return 0;
 	}
-	vaddr_t expr = strtoul(arg, NULL, 16);
+	//vaddr_t expr = strtoul(arg, NULL, 16);
+	bool success = true;
+	vaddr_t addr = expr(arg, &success);
+	if (!success) {
+		printf("Expression wrong.\n");
+		return 0;
+	}
 
 	int i;
 	while (n--) {
-		printf("  %x:   ", expr);
+		printf("  %x:   ", addr);
 		for (i = 0; i < 4; i++) {
-			printf("%02x ", vaddr_read(expr++, 1));
+			printf("%02x ", vaddr_read(addr++, 1));
 		}
 		printf("\n");
 	}
 	return 0;
 }
 /* pa1-4 */
+
+/* pa1-5 */
+static int cmd_p(char *args) {
+	char *arg = strtok(NULL, "");
+	if (arg == NULL) {
+		printf("Usage: p [EXPR]\n");
+		return 0;
+	}
+	bool success = true;
+	uint32_t result = expr(arg, &success);
+	if (success) {
+		printf("Expression result: %u\n", result);
+	}
+	else {
+		printf("Expression error.\n");
+	}
+	return 0;
+}
+/* pa1-5 */
 
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {

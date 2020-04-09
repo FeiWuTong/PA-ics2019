@@ -52,7 +52,7 @@ static struct rule {
   {"\\)", TK_RP},		// right parenthesis
   {"[1-9][0-9]*|0", NUM},		// number
   {"[a-zA-Z_]\\w*", VAR},	// variable
-  {"\\$[eE][a-zA-Z]{2}|pc", REG},	// register
+  {"\\$[eE][a-zA-Z]{2}|\\$pc", REG},	// register
   {"!=", TK_NEQ},		// not equal
   {"!", TK_NOT},		// not
   {"&&", TK_AND},		// and
@@ -87,7 +87,10 @@ typedef struct token {
   char str[32];
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+// TOKENS_SIZE default 32, test 500
+#define TOKENS_SIZE 500
+
+static Token tokens[TOKENS_SIZE] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -104,8 +107,10 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
+		/*
         Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
             i, rules[i].regex, position, substr_len, substr_len, substr_start);
+		*/
         position += substr_len;
 
         /* TODO: Now a new token is recognized with rules[i]. Add codes
@@ -146,9 +151,13 @@ static bool make_token(char *e) {
 /* pa1-5 test (for make_token)
  * FOR TEST: output the information of token in tokenArray
  */
-void tokenOutput() {
+void tokenOutput(int p, int q) {
 	int i;
-	for (i = 0; i < nr_token; i++) {
+	if (p < 0 || q > nr_token) {
+		printf("left boarder or right boarder wrong. \n");
+		return;
+	}
+	for (i = p; i < q; i++) {
 		if (tokens[i].type > 255) {
 			printf("Token[%d] - Type[%d] - Str[%s]\n", i, tokens[i].type, tokens[i].str);
 		} else {
@@ -160,6 +169,10 @@ void tokenOutput() {
 
 /* pa1-5 */
 static bool check_parentheses(int p, int q, bool *success) {
+	/*
+	tokenOutput(p, q);
+	printf("=========\n");
+	*/
 	int i, st = 0;
 	bool bnf = true;
 	if (tokens[p].type != TK_LP || tokens[q].type != TK_RP) {
@@ -184,6 +197,7 @@ static bool check_parentheses(int p, int q, bool *success) {
 	}
 	if (st != 0) {
 		*success = false;
+		printf("incompatible Parentheses, stack %d\n", st);
 		return false;
 	}
 	return bnf;
@@ -235,8 +249,14 @@ static int main_op_position(int p, int q) {
 			}
 		}
 		else if(tokens[i].type == TK_LP) {
-			while (tokens[i].type != ')' && i < q) {
-				i++;
+			int st = 1;
+			while (st != 0 && ++i < q) {
+				if (tokens[i].type == TK_LP) {
+					st++;
+				}
+				else if (tokens[i].type == TK_RP) {
+					st--;
+				}
 			}
 		}
 	}
@@ -253,7 +273,7 @@ static uint32_t eval(int p, int q, bool *success) {
 	}
 	if (p > q) {
 		/* Bad expression */
-		printf("Bad expression!, [%d, %d]\n", p, q);
+		printf("Bad expression! [%d, %d]\n", p, q);
 		*success = false;
 		return 0;
 	}
@@ -294,6 +314,7 @@ static uint32_t eval(int p, int q, bool *success) {
 			return 0;
 		}
 		int op_pos = main_op_position(p, q);
+		//printf("op_pos = %d | p = %d | q = %d\n", op_pos, p, q);
 		uint32_t val1 = 0;
 		if (tokens[op_pos].type != DEREF && tokens[op_pos].type != TK_NOT) {
 			val1 = eval(p, op_pos - 1, success);
@@ -361,7 +382,7 @@ uint32_t expr(char *e, bool *success) {
   }
 
   /* pa1-5 test */
-  //tokenOutput();
+  //tokenOutput(0, nr_token);
   /* pa1-5 test */
 
   /* TODO: Insert codes to evaluate the expression. */
