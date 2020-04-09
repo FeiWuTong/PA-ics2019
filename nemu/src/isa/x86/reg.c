@@ -49,5 +49,16 @@ void isa_reg_display() {
 }
 
 uint32_t isa_reg_str2val(const char *s, bool *success) {
-  return 0;
+	if (strcmp(s + 1, "pc") == 0) {
+		return cpu.pc;
+	}
+	int i;
+	for (i = R_EAX; i <= R_EDI; i ++) { 
+		if (strcmp(s + 1, reg_name(i, 4)) == 0) {
+			return reg_l(i);
+		}
+	}
+	printf("Invalid register name: %s\n", s);
+	*success = false;
+	return 0;
 }

@@ -141,12 +141,14 @@ static int cmd_x(char *args) {
 		return 0;
 	}
 	//vaddr_t expr = strtoul(arg, NULL, 16);
+	/* pa1-5 */
 	bool success = true;
 	vaddr_t addr = expr(arg, &success);
 	if (!success) {
 		printf("Expression wrong.\n");
 		return 0;
 	}
+	/* pa1-5 */
 
 	int i;
 	while (n--) {

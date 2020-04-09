@@ -7,6 +7,8 @@
 #include <regex.h>
 #include <stdlib.h>
 
+uint32_t isa_reg_str2val(const char *, bool *);
+
 enum {
   TK_NOTYPE = 256, TK_EQ,
 
@@ -287,18 +289,7 @@ static uint32_t eval(int p, int q, bool *success) {
 				TODO();
 				return 0;
 			case REG:
-				if (strcmp(tokens[p].str + 1, "pc") == 0) {
-					return cpu.pc;
-				}
-				int i;
-				for (i = R_EAX; i <= R_EDI; i ++) { 
-					if (strcmp(tokens[p].str + 1, reg_name(i, 4)) == 0) {
-						return reg_l(i);
-					}
-				}
-				printf("Invalid register name: %s\n", tokens[p].str);
-				*success = false;
-				return 0;
+				return isa_reg_str2val(tokens[p].str, success);
 			default:
 				printf("Invalid expression, token[%d] is redundant.\n", p);
 				*success = false;
