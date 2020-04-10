@@ -23,6 +23,10 @@ void difftest_step(vaddr_t ori_pc, vaddr_t next_pc);
 void asm_print(vaddr_t ori_pc, int instr_len, bool print_flag);
 void log_clearbuf(void);
 
+/* pa1-6 */
+bool check_wps();
+/* pa1-6 */
+
 static uint64_t g_nr_guest_instr = 0;
 
 void monitor_statistic(void) {
@@ -61,6 +65,11 @@ void cpu_exec(uint64_t n) {
   log_clearbuf();
 
     /* TODO: check watchpoints here. */
+  /* pa1-6 */
+  if (check_wps()) {
+	  nemu_state.state = NEMU_STOP;
+	  printf("Trigger watchpoint.\n");
+  }
 
 #endif
 

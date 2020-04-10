@@ -90,7 +90,7 @@ typedef struct token {
 } Token;
 
 // TOKENS_SIZE default 32, test 500
-#define TOKENS_SIZE 500
+#define TOKENS_SIZE 32
 
 static Token tokens[TOKENS_SIZE] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;

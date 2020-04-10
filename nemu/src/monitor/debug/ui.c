@@ -8,7 +8,16 @@
 #include <readline/history.h>
 
 void cpu_exec(uint64_t);
+
+/* pa1-4 */
 void isa_reg_display();
+/* pa1-4 */
+
+/* pa1-5 */
+WP* new_wp();
+void free_wp();
+void info_wps();
+/* pa1-5 */
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -49,6 +58,11 @@ static int cmd_x(char *args);
 static int cmd_p(char *args);
 /* pa1-5 */
 
+/* pa1-6 */
+static int cmd_w(char *args);
+static int cmd_d(char *args);
+/* pa1-6 */
+
 static struct {
   char *name;
   char *description;
@@ -63,6 +77,8 @@ static struct {
   { "info", "Usage: info [rw], [r] means print the register, [w] means print the watchpoint", cmd_info },
   { "x", "Scan memory from specific address, usage: x [N] [EXPR], where N represents output N-4bytes successively, and EXPR represents expression whose value will be starting address of the scan", cmd_x },
   { "p", "Evaluate the expression, usage: p [EXPR]", cmd_p},
+  { "w", "Set watchpoint for expression, usage: w [EXPR]", cmd_w},
+  { "d", "Delete watchpoint N, usage: d [N]", cmd_d},
 
 };
 
@@ -115,7 +131,9 @@ static int cmd_info(char *args) {
 		isa_reg_display();
 	}
 	else if (strcmp(subcmd, "w") == 0) {
-		; /* TODO */
+		/* pa1-6 */
+		info_wps();
+		/* pa1-6 */
 	}
 	else {
 		printf("Usage: info [rw]\nTry 'help info' for more information.\n");
@@ -180,6 +198,36 @@ static int cmd_p(char *args) {
 	return 0;
 }
 /* pa1-5 */
+
+/* pa1-6 */
+static int cmd_w(char *args) {
+	char *arg = strtok(NULL, "");
+	if (arg == NULL) {
+		printf("Usage: w [EXPR]\n");
+		return 0;
+	}
+	bool success = true;
+	uint32_t result = expr(arg, &success);
+	if (!success) {
+		printf("Set watchpoint failed: expression wrong.\n");
+		return 0;
+	}
+	WP *wp = new_wp();
+	strcpy(wp->expr, arg);
+	wp->result = result;
+	return 0;
+}
+
+static int cmd_d(char *args) {
+	char *arg = strtok(NULL, "");
+	if (arg == NULL) {
+		printf("Usage: d [N], N is watchpoint NO\n");
+		return 0;
+	}
+	free_wp(atoi(arg));
+	return 0;
+}
+/* pa1-6 */
 
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {
