@@ -137,7 +137,24 @@ static inline void rtl_not(rtlreg_t *dest, const rtlreg_t* src1) {
 
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
-  TODO();
+  if (width == 4) {
+	  rtl_mv(dest, src1);
+  } else {
+	  if ((*src1) & (1 << ((width << 3) - 1))) {
+		*dest = (~0u << (width << 3)) | (*src1);
+	  } else {
+		*dest = (~0u >> ((4 - width) << 3)) & (*src1);
+	  }
+  }
+  /* way 2
+  *dest = (*src1) & (~0u >> ((4 - width) << 3));
+  switch (width) {
+	case 4: return;
+	case 2: *dest = (uint32_t)(int16_t)(*dest); return;
+	case 1: *dest = (uint32_t)(int8_t)(*dest); return;
+	default: assert(0);
+  }
+  */
 }
 
 static inline void rtl_setrelopi(uint32_t relop, rtlreg_t *dest,
@@ -148,7 +165,8 @@ static inline void rtl_setrelopi(uint32_t relop, rtlreg_t *dest,
 
 static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- src1[width * 8 - 1]
-  TODO();
+  rtl_shri(dest, src1, (width << 3) - 1);
+  *dest &= 1;
 }
 
 static inline void rtl_mux(rtlreg_t* dest, const rtlreg_t* cond, const rtlreg_t* src1, const rtlreg_t* src2) {

@@ -25,26 +25,35 @@ static inline void rtl_sr(int r, const rtlreg_t* src1, int width) {
 
 static inline void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
+  rtl_subi(&cpu.esp, &cpu.esp, 4);
   // M[esp] <- src1
-  TODO();
+  rtl_sm(&cpu.esp, src1, 4);
 }
 
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
+  rtl_lm(dest, &cpu.esp, 4);
   // esp <- esp + 4
-  TODO();
+  rtl_addi(&cpu.esp, &cpu.esp, 4);
 }
 
 static inline void rtl_is_sub_overflow(rtlreg_t* dest,
     const rtlreg_t* res, const rtlreg_t* src1, const rtlreg_t* src2, int width) {
   // dest <- is_overflow(src1 - src2)
-  TODO();
+  // sb = sign bit / highest bit
+  // cond1: src1[sb] != src2[sb]
+  rtl_xor(dest, src1, src2);
+  // cond2: src1[sb] != res[sb] 
+  rtl_xor(&t0, src1, res);
+  // cond1 & cond2
+  rtl_and(dest, dest, &t0);
+  rtl_msb(dest, dest, width);
 }
 
 static inline void rtl_is_sub_carry(rtlreg_t* dest,
     const rtlreg_t* res, const rtlreg_t* src1) {
   // dest <- is_carry(src1 - src2)
-  TODO();
+  rtl_setrelop(RELOP_GTU, dest, res, src1);
 }
 
 static inline void rtl_is_add_overflow(rtlreg_t* dest,
@@ -61,10 +70,10 @@ static inline void rtl_is_add_carry(rtlreg_t* dest,
 
 #define make_rtl_setget_eflags(f) \
   static inline void concat(rtl_set_, f) (const rtlreg_t* src) { \
-    TODO(); \
+    cpu.f = *src; \
   } \
   static inline void concat(rtl_get_, f) (rtlreg_t* dest) { \
-    TODO(); \
+    *dest = cpu.f; \
   }
 
 make_rtl_setget_eflags(CF)
@@ -74,12 +83,13 @@ make_rtl_setget_eflags(SF)
 
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
   // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
-  TODO();
+  cpu.ZF = ((*result) & (~0u >> ((4 - width) << 3))) == 0;
 }
 
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
   // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
-  TODO();
+  rtl_msb(&t0, result, width);
+  cpu.SF = t0;
 }
 
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {

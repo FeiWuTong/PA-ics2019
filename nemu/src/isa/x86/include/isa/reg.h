@@ -47,6 +47,32 @@ typedef struct {
 
   vaddr_t pc;
 
+  // PA2
+  union {
+	rtlreg_t eflags;
+	struct {
+	  rtlreg_t CF	:1; // carry flag
+	  rtlreg_t		:1; // no use
+	  rtlreg_t PF	:1;
+	  rtlreg_t		:1;
+	  rtlreg_t AF	:1;
+	  rtlreg_t		:1;
+	  rtlreg_t ZF	:1; // zero flag
+	  rtlreg_t SF	:1; // sign flag
+	  rtlreg_t TF	:1;
+	  rtlreg_t IF	:1; // interrupt enable
+	  rtlreg_t DF	:1;
+	  rtlreg_t OF	:1; // overflow
+	  rtlreg_t IOPL	:2;
+	  rtlreg_t NT	:1;
+	  rtlreg_t		:1;
+	  rtlreg_t RF	:1;
+	  rtlreg_t VM	:1;
+	  rtlreg_t		:14;
+	};
+  };
+  // PA2
+
 } CPU_state;
 
 static inline int check_reg_index(int index) {
