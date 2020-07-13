@@ -21,7 +21,8 @@ make_EHelper(mov_cr2r) {
 }
 
 make_EHelper(int) {
-  TODO();
+  // refer to ../intr.c
+  // raise_intr(id_dest->val, decinfo.seq_pc);
 
   print_asm("int %s", id_dest->str);
 
@@ -29,7 +30,10 @@ make_EHelper(int) {
 }
 
 make_EHelper(iret) {
-  TODO();
+  rtl_pop(&decinfo.jmp_pc);
+  // no segments here
+  rtl_pop(&cpu.eflags);
+  rtl_j(decinfo.jmp_pc);
 
   print_asm("iret");
 }

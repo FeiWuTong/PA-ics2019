@@ -76,13 +76,33 @@ make_EHelper(inc) {
 }
 
 make_EHelper(dec) {
-  TODO();
+  rtl_subi(&s0, &id_dest->val, 1);
+
+  operand_write(id_dest, &s0);
+
+  rtl_update_ZFSF(&s0, id_dest->width);
+
+  rtl_li(&s1, 1);
+  rtl_is_sub_overflow(&s1, &s0, &id_dest->val, &s1, id_dest->width);
+  rtl_set_OF(&s1);
 
   print_asm_template1(dec);
 }
 
 make_EHelper(neg) {
-  TODO();
+  rtl_not(&s0, &id_dest->val);
+  rtl_addi(&s0, &s0, 1);
+
+  operand_write(id_dest, &s0);
+
+  rtl_update_ZFSF(&s0, id_dest->width);
+
+  rtl_setrelopi(RELOP_NE, &s1, &id_dest->val, 0);
+  rtl_set_CF(&s1);
+  
+  rtl_and(&s1, &s0, &id_dest->val);
+  rtl_msb(&s1, &s1, id_dest->width);
+  rtl_set_OF(&s1);
 
   print_asm_template1(neg);
 }

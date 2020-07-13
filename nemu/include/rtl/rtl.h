@@ -141,9 +141,9 @@ static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
 	  rtl_mv(dest, src1);
   } else {
 	  if ((*src1) & (1 << ((width << 3) - 1))) {
-		*dest = (~0u << (width << 3)) | (*src1);
+		  *dest = (~0u << (width << 3)) | (*src1);
 	  } else {
-		*dest = (~0u >> ((4 - width) << 3)) & (*src1);
+		  *dest = (~0u >> ((4 - width) << 3)) & (*src1);
 	  }
   }
   /* way 2
