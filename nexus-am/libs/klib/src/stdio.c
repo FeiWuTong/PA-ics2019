@@ -4,8 +4,13 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 int printf(const char *fmt, ...) {
-  assert(0);
-  return 0;
+  va_list ap;
+  char out[256];
+  va_start(ap, fmt);
+  int n = vsprintf(out, fmt, ap), i;
+  va_end(ap);
+  for (i = 0; i < n; i++) _putc(out[i]);
+  return n;
 }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
