@@ -95,9 +95,21 @@ make_EHelper(setcc) {
 }
 
 make_EHelper(not) {
-  rtl_not(&t0, &id_dest->val);
+  rtl_not(&s0, &id_dest->val);
 
-  operand_write(id_dest, &t0);
+  operand_write(id_dest, &s0);
 
   print_asm_template1(not);
+}
+
+make_EHelper(rol) {
+  rtl_shri(&s0, &id_dest->val, 32 - id_src->val);
+  rtl_shli(&s1, &id_dest->val, id_src->val);
+  rtl_or(&s0, &s0, &s1);
+
+  operand_write(id_dest, &s0);
+
+  // unnecessary to update CF and OF in NEMU
+
+  print_asm_template1(rol);
 }
