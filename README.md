@@ -15,3 +15,7 @@ The following subprojects/components are included. Some of them are not fully im
 * [Nexus-am](https://github.com/NJU-ProjectN/nexus-am)
 * [Nanos-lite](https://github.com/NJU-ProjectN/nanos-lite)
 * [Navy-apps](https://github.com/NJU-ProjectN/navy-apps)
+
+## My personal thought
+
+Here gives [my personal thought](Thought.md) while doing the experiment, you might get inspiration from it.
