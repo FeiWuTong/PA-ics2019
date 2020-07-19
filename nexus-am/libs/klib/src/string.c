@@ -11,14 +11,7 @@ size_t strlen(const char *s) {
 }
 
 char *strcpy(char* dst,const char* src) {
-  assert(dst != NULL && src != NULL);
-  int i, n2 = strlen(src);
-  if (dst <= src) {
-	for (i = 0; i <= n2; i++) dst[i] = src[i];
-  } else {
-	for (i = n2; i >= 0; i--) dst[i] = src[i];
-  }
-  return dst;
+  return memcpy(dst, src, strlen(src));
 }
 
 char* strncpy(char* dst, const char* src, size_t n) {
@@ -54,15 +47,21 @@ void* memset(void* v,int c,size_t n) {
 }
 
 void* memcpy(void* out, const void* in, size_t n) {
-  assert(0);
-  return NULL;
+  assert(out != NULL && in != NULL);
+  int i;
+  if (out <= in) {
+	for (i = 0; i < n; i++) *((char *)out + i) = *((char *)in + i);
+  } else {
+	for (i = n - 1; i >= 0; i--) *((char *)out + i) = *((char *)in + i);
+  }
+  return out;
 }
 
 int memcmp(const void* s1, const void* s2, size_t n){
   if (s1 == NULL || s2 == NULL) return s1 != NULL ? 1 : (s2 == NULL ? 0 : -1);
   int i;
   for (i = 0; i < n; i++) {
-	if (*(int *)(s1 + i) != *(int *)(s2 + i)) return *(int *)s1 - *(int *)s2;
+	if (*((char *)s1 + i) != *((char *)s2 + i)) return *((char *)s1 + i) - *((char *)s2 + i);
   }
   return 0;
 }
