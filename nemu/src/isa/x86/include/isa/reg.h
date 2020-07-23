@@ -73,6 +73,15 @@ typedef struct {
   };
   // PA2
 
+  // PA3
+  // Indeed, we dont realize segment, but here we just adjust DiffTest in QEMU
+  rtlreg_t cs;
+
+  struct {
+	uint32_t base;
+	uint16_t limit;
+  } idtr;
+
 } CPU_state;
 
 static inline int check_reg_index(int index) {
