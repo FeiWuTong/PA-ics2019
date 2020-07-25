@@ -14,8 +14,8 @@ int printf(const char *fmt, ...) {
 }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
-  int n = 0, num, buf_n;
-  char buf[10];
+  int n = 0, num, buf_n, temp;
+  char buf[32];
   char *s;
   while (*fmt) {
 	if (*fmt == '%') {
@@ -31,6 +31,15 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
 		case 's':
 		  s = va_arg(ap, char*);
 		  while (*s) out[n++] = *s++;
+		  break;
+		case 'x':
+		  num = va_arg(ap, int), buf_n = 0;
+		  while (num) {
+			temp = num % 16;
+			buf[buf_n++] = temp >= 10 ? (temp - 10) + 'a' : temp + '0';
+			num /= 16;
+		  }
+		  while (buf_n--) out[n++] = buf[buf_n];
 		  break;
 		default:
 		  out[n++] = *fmt;

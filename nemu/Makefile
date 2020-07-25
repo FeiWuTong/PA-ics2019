@@ -62,6 +62,7 @@ override ARGS ?= -l $(BUILD_DIR)/nemu-log.txt
 override ARGS += -d $(QEMU_SO)
 
 # Command to execute NEMU
+# nanos IMG - $(NEMU_HOME)/../nanos-lites/build/nanos-lite-x86-nemu.bin
 IMG :=
 NEMU_EXEC := $(BINARY) $(ARGS) $(IMG)
 
