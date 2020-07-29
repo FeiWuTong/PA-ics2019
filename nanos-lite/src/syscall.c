@@ -12,6 +12,8 @@ void sys_exit(int code) {
 
 size_t sys_write(int fd, const void *buf, size_t count) {
   size_t success = 0;
+  // test for sbrk
+  //Log("SYS_write are called.");
   switch (fd) {
 	case 1:
 	case 2:
@@ -21,6 +23,11 @@ size_t sys_write(int fd, const void *buf, size_t count) {
 	  panic("Unhandled sys_write fd = %d", fd);
 	  return 0;
   }
+}
+
+int sys_brk(void *addr) {
+  // PA3 do not realize sys_brk in fact, just return 0 in fake
+  return 0;
 }
 
 _Context* do_syscall(_Context *c) {
@@ -34,6 +41,7 @@ _Context* do_syscall(_Context *c) {
 	case SYS_yield: c->GPRx = sys_yield(); break;
 	case SYS_exit: sys_exit(a[1]); break;
 	case SYS_write: c->GPRx = sys_write(a[1], (void *)a[2], a[3]); break;
+	case SYS_brk: c->GPRx = sys_brk((void *)a[1]); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 
