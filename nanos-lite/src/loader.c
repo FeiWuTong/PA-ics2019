@@ -1,5 +1,6 @@
 #include "proc.h"
 #include <elf.h>
+#include "fs.h"
 
 #ifdef __ISA_AM_NATIVE__
 # define Elf_Ehdr Elf64_Ehdr
@@ -9,24 +10,26 @@
 # define Elf_Phdr Elf32_Phdr
 #endif
 
-extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
-
 static uintptr_t loader(PCB *pcb, const char *filename) {
+  int fd = fs_open(filename, 0, 0);
   Elf_Ehdr eh;
   Elf_Phdr ph;
   int i;
-  size_t phoff;
-  ramdisk_read(&eh, 0, sizeof(Elf_Ehdr));
+  size_t ph_offset;
+  ph_offset = fs_read(fd, &eh, sizeof(Elf_Ehdr));
 
-  for (i = 0, phoff = eh.e_phoff; i < eh.e_phnum; i++) {
-	phoff += ramdisk_read(&ph, phoff, eh.e_phentsize);
+  for (i = 0; i < eh.e_phnum; i++) {
+	ph_offset += fs_read(fd, &ph, eh.e_phentsize);
 	if (ph.p_type == PT_LOAD) {
-	  ramdisk_read((void *)ph.p_vaddr, ph.p_offset, ph.p_filesz);
+	  fs_lseek(fd, ph.p_offset, SEEK_SET);
+	  fs_read(fd, (void *)ph.p_vaddr, ph.p_filesz);
 	  if (ph.p_memsz > ph.p_filesz) memset((void *)(ph.p_vaddr + ph.p_filesz), 0, ph.p_memsz - ph.p_filesz);
+	  fs_lseek(fd, ph_offset, SEEK_SET);
 	} else {
 	  break;
 	}
   }
+  fs_close(fd);
   return eh.e_entry;
 }
 
