@@ -41,6 +41,7 @@ void init_fs() {
 // ===== PA3 =====
 
 extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
+extern size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 
 int fs_open(const char *pathname, int flags, int mode) {
   int i;
@@ -86,4 +87,15 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
 	  panic("should not reach here");
   }
   return file_table[fd].open_offset;
+}
+
+size_t fs_write(int fd, const void *buf, size_t len) {
+  if (file_table[fd].open_offset + len > file_table[fd].size) len = file_table[fd].size - file_table[fd].open_offset;
+  if (file_table[fd].write == NULL) {
+	len = ramdisk_write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+  } else {
+	len = file_table[fd].write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+  }
+  file_table[fd].open_offset += len;
+  return len;
 }
