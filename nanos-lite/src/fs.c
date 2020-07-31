@@ -12,7 +12,7 @@ typedef struct {
   WriteFn write;
 } Finfo;
 
-enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_FB};
+enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENTS, FD_FB};
 
 size_t invalid_read(void *buf, size_t offset, size_t len) {
   panic("should not reach here");
@@ -26,12 +26,14 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
 
 // PA3 extern
 extern size_t serial_write(const void *, size_t, size_t);
+extern size_t events_read(void *, size_t, size_t);
 
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {
   {"stdin", 0, 0, 0,  invalid_read, invalid_write},
   {"stdout", 0, 0, 0, invalid_read, serial_write},
   {"stderr", 0, 0, 0,  invalid_read, serial_write},
+  {"/dev/events", 0, 0, 0, events_read, invalid_write},
 #include "files.h"
 };
 
@@ -59,7 +61,9 @@ int fs_open(const char *pathname, int flags, int mode) {
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
-  if (file_table[fd].open_offset + len > file_table[fd].size) len = file_table[fd].size - file_table[fd].open_offset;
+  if (fd != FD_EVENTS) {
+	if (file_table[fd].open_offset + len > file_table[fd].size) len = file_table[fd].size - file_table[fd].open_offset;
+  }
   if (file_table[fd].read == NULL) {
 	len = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
   } else {
