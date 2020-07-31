@@ -12,17 +12,7 @@ void sys_exit(int code) {
 }
 
 size_t sys_write(int fd, const void *buf, size_t count) {
-  size_t success = 0;
-  // test for sbrk
-  //Log("SYS_write are called.");
-  switch (fd) {
-	case 1:
-	case 2:
-	  while (success < count) _putc(*((char *)buf + success++));
-	  return success;
-	default:
-	  return fs_write(fd, buf, count);
-  }
+  return fs_write(fd, buf, count);
 }
 
 int sys_brk(void *addr) {
