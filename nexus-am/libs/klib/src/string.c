@@ -15,8 +15,7 @@ char *strcpy(char* dst,const char* src) {
 }
 
 char* strncpy(char* dst, const char* src, size_t n) {
-  assert(0);
-  return NULL;
+  return memcpy(dst, src, n);
 }
 
 char* strcat(char* dst, const char* src) {

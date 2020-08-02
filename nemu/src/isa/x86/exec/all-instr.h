@@ -43,6 +43,8 @@ make_EHelper(cwtl);
 make_EHelper(movsx);
 make_EHelper(movzx);
 make_EHelper(lea);
+make_EHelper(movsb);
+make_EHelper(movsv);
 
 // logic.c
 make_EHelper(test);
