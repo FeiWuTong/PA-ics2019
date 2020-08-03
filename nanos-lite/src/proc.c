@@ -28,9 +28,14 @@ void init_proc() {
   Log("Initializing processes...");
 
   // load program here
-  naive_uload(NULL, "/bin/bmptest");
+  naive_uload(NULL, "/bin/init");
 }
 
 _Context* schedule(_Context *prev) {
   return NULL;
+}
+
+extern void naive_uload(PCB *, const char *);
+void execve_uload(const char *filename) {
+  naive_uload(NULL, filename);
 }

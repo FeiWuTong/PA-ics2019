@@ -7,10 +7,6 @@ uintptr_t sys_yield() {
   return 0;
 }
 
-void sys_exit(int code) {
-  _halt(code);
-}
-
 size_t sys_write(int fd, const void *buf, size_t count) {
   return fs_write(fd, buf, count);
 }
@@ -36,6 +32,23 @@ size_t sys_lseek(int fd, size_t offset, int whence) {
   return fs_lseek(fd, offset, whence);
 }
 
+extern void execve_uload(const char *);
+
+int sys_execve(const char *filename, char *const argv[], char *const envp[]) {
+  Log("sys_execve: %s", filename);
+  execve_uload(filename);
+  return 0;
+}
+
+void sys_exit(int code) {
+  if (code == 0) {
+	Log("Run successfully and return to menu");
+	sys_execve("/bin/init", NULL, NULL);
+  } else {
+	_halt(code);
+  }
+}
+
 _Context* do_syscall(_Context *c) {
   uintptr_t a[4];
   a[0] = c->GPR1;
@@ -52,6 +65,7 @@ _Context* do_syscall(_Context *c) {
 	case SYS_read: c->GPRx = sys_read(a[1], (void *)a[2], a[3]); break;
 	case SYS_close: c->GPRx = sys_close(a[1]); break;
 	case SYS_lseek: c->GPRx = sys_lseek(a[1], a[2], a[3]); break;
+	case SYS_execve: c->GPRx = sys_execve((char *)a[1], (char **)a[2], (char **)a[3]); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 
