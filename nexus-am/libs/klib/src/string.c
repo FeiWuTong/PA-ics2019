@@ -11,16 +11,22 @@ size_t strlen(const char *s) {
 }
 
 char *strcpy(char* dst,const char* src) {
-  return memcpy(dst, src, strlen(src));
+  size_t i;
+  for (i = 0; src[i] != '\0'; i++) dst[i] = src[i];
+  dst[i] = '\0';
+  return dst;
 }
 
 char* strncpy(char* dst, const char* src, size_t n) {
-  return memcpy(dst, src, n);
+  size_t i;
+  for (i = 0; i < n && src[i] != '\0'; i++) dst[i] = src[i];
+  for (; i < n; i++) dst[i] = '\0';
+  return dst;
 }
 
 char* strcat(char* dst, const char* src) {
   assert(dst != NULL && src != NULL);
-  int n1 = strlen(dst);
+  size_t n1 = strlen(dst);
   while (*src != '\0') dst[n1++] = *(src++);
   dst[n1] = '\0';
   return dst;
