@@ -5,7 +5,7 @@
 
 int printf(const char *fmt, ...) {
   va_list ap;
-  char out[1024];
+  char out[5096];
   va_start(ap, fmt);
   int n = vsprintf(out, fmt, ap), i;
   va_end(ap);
@@ -105,6 +105,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   return outptr - out;
 }
 
+/*
 int vsnprintf(char *out, size_t size, const char *fmt, va_list ap) {
   if (size == 0) return 0;
   else size--;
@@ -265,8 +266,7 @@ int vsnprintf(char *out, size_t size, const char *fmt, va_list ap) {
 		default:
 		  if (*fmt >= '0' && *fmt <= '9') {
 			width = 10 * width + *fmt - '0';
-		  }
-		  else {
+		  } else {
 			*outptr++ = *fmt;
 			size--;
 		  }
@@ -283,6 +283,7 @@ int vsnprintf(char *out, size_t size, const char *fmt, va_list ap) {
   *outptr = '\0';
   return outptr - out;
 }
+*/
 
 int sprintf(char *out, const char *fmt, ...) {
   va_list ap;
@@ -292,6 +293,7 @@ int sprintf(char *out, const char *fmt, ...) {
   return n;
 }
 
+/*
 int snprintf(char *out, size_t n, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
@@ -299,8 +301,9 @@ int snprintf(char *out, size_t n, const char *fmt, ...) {
   va_end(ap);
   return ret_n;
 }
+*/
 
-/* not std, fake snprintf
+// not std, fake snprintf
 int snprintf(char *out, size_t n, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
@@ -312,6 +315,5 @@ int snprintf(char *out, size_t n, const char *fmt, ...) {
   }
   return ret_n;
 }
-*/
 
 #endif

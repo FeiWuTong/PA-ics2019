@@ -63,6 +63,9 @@ static int cmd_w(char *args);
 static int cmd_d(char *args);
 /* pa1-6 */
 
+static int cmd_detach(char *args);
+static int cmd_attach(char *args);
+
 static struct {
   char *name;
   char *description;
@@ -79,6 +82,8 @@ static struct {
   { "p", "Evaluate the expression, usage: p [EXPR]", cmd_p},
   { "w", "Set watchpoint for expression, usage: w [EXPR]", cmd_w},
   { "d", "Delete watchpoint N, usage: d [N]", cmd_d},
+  { "detach", "detach from DiffTest mode", cmd_detach},
+  { "attach", "attach to DiffTest mode", cmd_attach},
 
 };
 
@@ -228,6 +233,23 @@ static int cmd_d(char *args) {
 	return 0;
 }
 /* pa1-6 */
+
+// ===== PA3 ======
+extern void difftest_detach();
+extern void difftest_attach();
+
+static int cmd_detach(char *args) {
+	difftest_detach();
+	printf("Finish detaching.\n");
+	return 0;
+}
+
+static int cmd_attach(char *args) {
+	printf("Attaching...\n");
+	difftest_attach();
+	printf("Finish attaching.\n");
+	return 0;
+}
 
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {
