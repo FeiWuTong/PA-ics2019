@@ -41,3 +41,19 @@ void isa_difftest_attach(void) {
   ref_difftest_memcpy_from_dut(0, guest_to_host(0), 0x7c00);
   ref_difftest_memcpy_from_dut(IMAGE_START, guest_to_host(IMAGE_START), PMEM_SIZE - IMAGE_START);
 }
+
+void isa_take_snapshot(char *filename) {
+  FILE *fp;
+  fp = fopen(filename, "wb");
+  fwrite((void *)&cpu, sizeof(cpu), 1, fp);
+  fwrite(guest_to_host(0), 1, PMEM_SIZE, fp);
+  fclose(fp);
+}
+
+void isa_recover_snapshot(char *filename) {
+  FILE *fp;
+  fp = fopen(filename, "rb");
+  fread((void *)&cpu, sizeof(cpu), 1, fp);
+  fread(guest_to_host(0), 1, PMEM_SIZE, fp);
+  fclose(fp);
+}
