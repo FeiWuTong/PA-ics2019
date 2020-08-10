@@ -46,6 +46,9 @@ void isa_reg_display() {
 		printf("%s - 0x%x\n", reg_name(i, 4), reg_l(i));
 	}
 	printf("pc - 0x%x\n", cpu.pc);
+	printf("eflags - 0x%x\n", cpu.eflags);
+	printf("idtr.base - 0x%x\n", cpu.idtr.base);
+	printf("idtr.limit - 0x%x\n", cpu.idtr.limit);
 }
 
 uint32_t isa_reg_str2val(const char *s, bool *success) {

@@ -1,7 +1,11 @@
 #include "common.h"
 
+extern _Context* do_syscall(_Context* c);
+
 static _Context* do_event(_Event e, _Context* c) {
   switch (e.event) {
+	case _EVENT_SYSCALL: do_syscall(c); break;
+	case _EVENT_YIELD: Log("Triger event [YIELD]"); break;
     default: panic("Unhandled event ID = %d", e.event);
   }
 

@@ -15,6 +15,7 @@ static bool is_detach = false;
 // this is used to let ref skip instructions which
 // can not produce consistent behavior with NEMU
 void difftest_skip_ref() {
+  if (is_detach) return;
   is_skip_ref = true;
   // If such an instruction is one of the instruction packing in QEMU
   // (see below), we end the process of catching up with QEMU's pc to
@@ -33,6 +34,7 @@ void difftest_skip_ref() {
 //   Let REF run `nr_ref` instructions first.
 //   We expect that DUT will catch up with REF within `nr_dut` instructions.
 void difftest_skip_dut(int nr_ref, int nr_dut) {
+  if (is_detach) return;
   skip_dut_nr_instr += nr_dut;
 
   while (nr_ref -- > 0) {
@@ -85,6 +87,8 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
   if (!isa_difftest_checkregs(ref, pc)) {
     extern void isa_reg_display(void);
     isa_reg_display();
+	printf("But in qemu...\n");
+	printf("0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x\n", ref->eax, ref->ecx, ref->edx, ref->ebx, ref->esp, ref->ebp, ref->esi, ref->edi, ref->pc);
     nemu_state.state = NEMU_ABORT;
     nemu_state.halt_pc = pc;
   }

@@ -63,6 +63,11 @@ static int cmd_w(char *args);
 static int cmd_d(char *args);
 /* pa1-6 */
 
+static int cmd_detach(char *args);
+static int cmd_attach(char *args);
+static int cmd_save(char *args);
+static int cmd_load(char *args);
+
 static struct {
   char *name;
   char *description;
@@ -79,6 +84,10 @@ static struct {
   { "p", "Evaluate the expression, usage: p [EXPR]", cmd_p},
   { "w", "Set watchpoint for expression, usage: w [EXPR]", cmd_w},
   { "d", "Delete watchpoint N, usage: d [N]", cmd_d},
+  { "detach", "Detach from DiffTest mode", cmd_detach},
+  { "attach", "Attach to DiffTest mode", cmd_attach},
+  { "save", "Save snapshot, usage: save [path]", cmd_save},
+  { "load", "Load snapshot, usage: load [path]", cmd_load},
 
 };
 
@@ -228,6 +237,47 @@ static int cmd_d(char *args) {
 	return 0;
 }
 /* pa1-6 */
+
+// ===== PA3 ======
+extern void difftest_detach();
+extern void difftest_attach();
+extern void isa_take_snapshot(char *);
+extern void isa_recover_snapshot(char *);
+
+static int cmd_detach(char *args) {
+	difftest_detach();
+	printf("Finish detaching.\n");
+	return 0;
+}
+
+static int cmd_attach(char *args) {
+	printf("Attaching...\n");
+	difftest_attach();
+	printf("Finish attaching.\n");
+	return 0;
+}
+
+static int cmd_save(char *args) {
+	char *arg = strtok(NULL, "");
+	if (arg == NULL) {
+		printf("Usage: save [path]\n");
+		return 0;
+	}
+	isa_take_snapshot(arg);
+	return 0;
+}
+
+static int cmd_load(char *args) {
+	char *arg = strtok(NULL, "");
+	if (arg == NULL) {
+		printf("Usage: load [path]\n");
+		return 0;
+	}
+	isa_recover_snapshot(arg);
+	return 0;
+}
+
+// ====== PA3 =====
 
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {

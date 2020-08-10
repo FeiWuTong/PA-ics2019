@@ -34,14 +34,14 @@ make_EHelper(pusha) {
 }
 
 make_EHelper(popa) {
-  rtl_push(&cpu.edi);
-  rtl_push(&cpu.esi);
-  rtl_push(&cpu.ebp);
-  rtl_push(&s0);
-  rtl_push(&cpu.ebx);
-  rtl_push(&cpu.edx);
-  rtl_push(&cpu.ecx);
-  rtl_push(&cpu.eax);
+  rtl_pop(&cpu.edi);
+  rtl_pop(&cpu.esi);
+  rtl_pop(&cpu.ebp);
+  rtl_pop(&s0);
+  rtl_pop(&cpu.ebx);
+  rtl_pop(&cpu.edx);
+  rtl_pop(&cpu.ecx);
+  rtl_pop(&cpu.eax);
 
   print_asm("popa");
 }
@@ -95,4 +95,24 @@ make_EHelper(movzx) {
 make_EHelper(lea) {
   operand_write(id_dest, &id_src->addr);
   print_asm_template2(lea);
+}
+
+make_EHelper(movsb) {
+  rtl_lm(&s0, &cpu.esi, 1);
+  rtl_sm(&cpu.edi, &s0, 1);
+  cpu.edi++;
+  cpu.esi++;
+
+  print_asm_template2(movsb);
+}
+
+make_EHelper(movsv) {
+  if (decinfo.isa.is_operand_size_16) rtl_li(&s0, 2);
+  else rtl_li(&s0, 4);
+  rtl_lm(&s1, &cpu.esi, s0);
+  rtl_sm(&cpu.edi, &s1, s0);
+  rtl_add(&cpu.edi, &cpu.edi, &s0);
+  rtl_add(&cpu.esi, &cpu.esi, &s0);
+
+  print_asm_template2(movsv);
 }

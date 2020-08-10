@@ -1,7 +1,9 @@
 #include "cpu/exec.h"
 
 make_EHelper(lidt) {
-  TODO();
+  cpu.idtr.limit = vaddr_read(id_dest->addr, 2);
+  cpu.idtr.base = vaddr_read(id_dest->addr + 2, 4);
+  if (decinfo.isa.is_operand_size_16) cpu.idtr.base &= 0x00ffffff;
 
   print_asm_template1(lidt);
 }
@@ -22,7 +24,7 @@ make_EHelper(mov_cr2r) {
 
 make_EHelper(int) {
   // refer to ../intr.c
-  // raise_intr(id_dest->val, decinfo.seq_pc);
+  raise_intr(id_dest->val, decinfo.seq_pc);
 
   print_asm("int %s", id_dest->str);
 
@@ -31,7 +33,7 @@ make_EHelper(int) {
 
 make_EHelper(iret) {
   rtl_pop(&decinfo.jmp_pc);
-  // no segments here
+  rtl_pop(&cpu.cs);
   rtl_pop(&cpu.eflags);
   rtl_j(decinfo.jmp_pc);
 

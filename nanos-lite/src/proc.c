@@ -2,6 +2,9 @@
 
 #define MAX_NR_PROC 4
 
+// PA3
+extern void naive_uload(PCB *pcb, const char *filename);
+
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
 PCB *current = NULL;
@@ -25,9 +28,15 @@ void init_proc() {
   Log("Initializing processes...");
 
   // load program here
-
+  naive_uload(NULL, "/bin/dummy");
+  //naive_uload(NULL, "/bin/init");
 }
 
 _Context* schedule(_Context *prev) {
   return NULL;
+}
+
+extern void naive_uload(PCB *, const char *);
+void execve_uload(const char *filename) {
+  naive_uload(NULL, filename);
 }
