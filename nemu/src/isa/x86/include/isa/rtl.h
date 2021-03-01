@@ -61,7 +61,7 @@ static inline void rtl_is_add_overflow(rtlreg_t* dest,
   // dest <- is_overflow(src1 + src2)
   rtl_xor(dest, src1, src2);
   rtl_not(dest, dest);
-  rtl_xor(&t0, src1, dest);
+  rtl_xor(&t0, src1, res);
   rtl_and(dest, dest, &t0);
   rtl_msb(dest, dest, width);
 }
